@@ -1,0 +1,67 @@
+# matcher_extra_domain           # 匹配特殊域名请求
+# exclude_ad_domain              # 排除广告域名请求
+# matcher_ad_domain              # 匹配广告域名请求
+# exclude_mainland_domain        # 排除大陆域名请求
+# matcher_mainland_domain        # 匹配大陆域名请求
+# matcher_oversea_domain         # 匹配境外域名请求
+# exclude_mainland_ip            # 排除大陆 IP 应答
+# matcher_mainland_ip            # 匹配大陆 IP 应答
+
+plugins: 
+##################################################
+  - tag: 'matcher_extra_domain'  # 匹配特殊域名请求
+    type: 'query_matcher'
+    args: 
+      domain:
+
+##################################################
+  - tag: 'exclude_ad_domain'     # 排除广告域名请求
+    type: 'query_matcher'
+    args:
+      domain:
+
+##################################################
+  - tag: 'matcher_ad_domain'     # 匹配广告域名请求
+    type: 'query_matcher'
+    args:
+      domain:
+        # oisd 域名表
+        - 'provider:oisd'
+
+##################################################
+  - tag: 'exclude_mainland_domain' # 排除大陆域名请求
+    type: 'query_matcher'
+    args:
+      domain:
+
+##################################################
+  - tag: 'matcher_mainland_domain' # 匹配大陆域名请求
+    type: 'query_matcher'
+    args:
+      domain:
+        # CN 类域名
+        - 'provider:geosite:cn,category-games@cn,apple-cn,google-cn'
+
+##################################################
+  - tag: 'matcher_oversea_domain' # 匹配境外域名请求
+    type: 'query_matcher'
+    args:
+      domain:
+        # 非 CN 类域名
+        - 'provider:geosite:geolocation-!cn'
+
+##################################################
+  - tag: 'exclude_mainland_ip'   # 排除大陆 IP 应答
+    type: response_matcher
+    args:
+      ip:
+        # 已知污染 IP
+        - 'provider:forged_IPv4'
+
+##################################################
+  - tag: 'matcher_mainland_ip'   # 匹配大陆 IP 应答
+    type: response_matcher
+    args:
+      ip:
+        # CN 类 IP
+        - 'provider:geoip:cn'

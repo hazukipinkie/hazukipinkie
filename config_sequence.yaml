@@ -1,0 +1,76 @@
+# forward_fallback               # 提交境外服务器解析，允许回落大陆
+# sequence_bypass                # 分流序列
+# sequence_final                 # 其它
+# sequence_main                  # 主序列
+
+plugins:
+##################################################
+  - tag: 'forward_fallback'      # 提交境外服务器解析，允许回落大陆
+    type: sequence
+    args:
+      exec:
+        - primary:
+              - parallel:
+                  - - 'forward_eastasia'
+          secondary:
+            - - 'ecs_mainland'
+              - 'forward_mainland'
+          stat_length: 5 
+          threshold: 2 
+
+##################################################
+  - tag: 'sequence_bypass'       # 分流序列
+    type: 'sequence' 
+    args: 
+      exec: 
+        # 请求特殊域名
+        - if: 'matcher_extra_domain' 
+          exec: # 备用服务器解析
+            - 'forward_backup'      
+            - '_return'
+        # 请求广告域名 且 非排除广告域名
+        - if: '! exclude_ad_domain && matcher_ad_domain'
+          exec: # 丢弃应答
+            - '_drop_response'
+            - '_return'
+        # 请求大陆域名 且 非排除大陆域名
+        - if: '! exclude_mainland_domain && matcher_mainland_domain'
+          exec: # 覆盖请求来源，提交大陆服务器解析
+            - 'ecs_mainland'
+            - 'forward_mainland'
+            - '_return'
+        # 请求境外域名 或 排除大陆域名
+        - if: 'exclude_mainland_domain || matcher_oversea_domain'
+          exec: # 提交境外服务器解析
+            - parallel:
+                - - 'forward_eastasia'
+            - '_return'   
+
+##################################################
+  - tag: 'sequence_final'         # 其它
+    type: 'sequence'
+    args:
+      exec:
+        - primary:
+            - - 'ecs_mainland'
+              - 'forward_mainland'
+              # 应答非大陆 IP 或 排除大陆 IP 
+              - if: 'exclude_mainland_ip || ! matcher_mainland_ip'
+                exec:
+                  - '_drop_response' # 丢弃应答
+          secondary:
+               - parallel:
+                   - - 'forward_eastasia'
+          fast_fallback: 250
+          always_standby: true
+
+##################################################
+  - tag: 'sequence_main'          # 主序列
+    type: 'sequence' 
+    args: 
+      exec: 
+        - 'hosts'                 # 域名映射
+        - '_prefer_ipv4'          # 屏蔽双栈域名的 AAAA 请求，预初始化插件
+        - 'sequence_bypass'       # 分流序列
+        - 'sequence_final'        # 其它
+        - 'ttl'                   # 限制应答生存时间

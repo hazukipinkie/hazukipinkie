@@ -1,0 +1,52 @@
+# forward_bootstrap              # 引导服务器
+# forward_backup                 # 备用服务器
+# forward_mainland               # 大陆服务器
+# forward_eastasia               # 东亚服务器
+# forward_cloudflare             # cloudflare 服务器
+
+plugins:
+##################################################
+  - tag: 'forward_bootstrap'     # 引导服务器
+    type: 'fast_forward' 
+    args: 
+      upstream:
+        # Quad 101 in Taiwan
+        - addr: '101.102.103.104'
+        # Quad 101 in Taiwan
+        - addr: '101.101.101.101' 
+
+##################################################
+  - tag: 'forward_backup'        # 备用服务器
+    type: 'fast_forward'
+    args: 
+      upstream: 
+        # CNNIC SDNS
+        - addr: '1.2.4.8'
+
+##################################################
+  - tag: 'forward_mainland'      # 大陆服务器
+    type: 'fast_forward'
+    args:
+      upstream:
+        # DNSPod
+        - addr: 'tls://dot.pub'
+        # AliDNS
+        - addr: 'tls://dns.alidns.com'
+
+##################################################
+  - tag: 'forward_eastasia'       # 东亚服务器
+    type: 'fast_forward'
+    args:
+      upstream:
+        # Quad 101 in Taiwan
+        - addr: 'https://dns.twnic.tw/dns-query'
+        # Internet Initiative Japan in Tokyo with logs
+        - addr: 'https://public.dns.iij.jp/dns-query'
+
+##################################################
+  - tag: 'forward_cloudflare'     # cloudflare 服务器
+    type: 'fast_forward'
+    args:
+      upstream:
+        # Cloudflare
+        - addr: 'https://cloudflare-dns.com/dns-query'
