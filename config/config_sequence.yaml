@@ -1,24 +1,7 @@
-# forward_fallback               # 提交境外服务器解析，允许回落大陆
 # sequence_bypass                # 分流序列
 # sequence_final                 # 其它
 # sequence_main                  # 主序列
 
-plugins:
-##################################################
-  - tag: 'forward_fallback'      # 提交境外服务器解析，允许回落大陆
-    type: sequence
-    args:
-      exec:
-        - primary:
-              - parallel:
-                  - - 'forward_eastasia'
-          secondary:
-            - - 'ecs_mainland'
-              - 'forward_mainland'
-          stat_length: 5 
-          threshold: 2 
-
-##################################################
   - tag: 'sequence_bypass'       # 分流序列
     type: 'sequence' 
     args: 
@@ -44,27 +27,27 @@ plugins:
           exec: # 提交境外服务器解析
             - parallel:
                 - - 'forward_eastasia'
+                # - - 'forward_cloudflare'
             - '_return'   
 
-##################################################
   - tag: 'sequence_final'         # 其它
     type: 'sequence'
     args:
       exec:
-        - primary:
+        - primary: # 覆盖请求来源，提交大陆服务器解析
             - - 'ecs_mainland'
               - 'forward_mainland'
               # 应答非大陆 IP 或 排除大陆 IP 
               - if: 'exclude_mainland_ip || ! matcher_mainland_ip'
                 exec:
                   - '_drop_response' # 丢弃应答
-          secondary:
-               - parallel:
+          secondary: 提交境外服务器解析
+             - - parallel:
                    - - 'forward_eastasia'
-          fast_fallback: 250
-          always_standby: true
+                   # - - 'forward_cloudflare'
+          fast_fallback: 250      # 快速回落：超时无应答则回落
+          always_standby: true    # 主次分支同时执行
 
-##################################################
   - tag: 'sequence_main'          # 主序列
     type: 'sequence' 
     args: 
