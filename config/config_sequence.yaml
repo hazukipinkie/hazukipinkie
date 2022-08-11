@@ -2,6 +2,7 @@
 # sequence_final                 # 其它
 # sequence_main                  # 主序列
 
+plugins:
   - tag: 'sequence_bypass'       # 分流序列
     type: 'sequence' 
     args: 
@@ -41,7 +42,7 @@
               - if: 'exclude_mainland_ip || ! matcher_mainland_ip'
                 exec:
                   - '_drop_response' # 丢弃应答
-          secondary: 提交境外服务器解析
+          secondary: # 提交境外服务器解析
              - - parallel:
                    - - 'forward_eastasia'
                    # - - 'forward_cloudflare'
