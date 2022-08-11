@@ -1,0 +1,31 @@
+# hosts                          # 域名映射
+# ecs_mainland                   # 覆盖请求来源
+# ttl                            # 应答生存 300 ~ 1500（ms）
+
+plugins:
+  - tag: 'hosts'                 # 域名映射
+    type: 'hosts' 
+    args: 
+      hosts:
+        # DNSPod
+        - 'full:dot.pub 1.12.12.12 120.53.53.53'
+        # AliDNS
+        - 'full:dns.alidns.com 223.5.5.5 223.6.6.6'
+        # Quad 101 DNS
+        - 'full:dns.twnic.tw 101.101.101.101 101.102.103.104'
+        # Internet Initiative Japan DNS
+        - 'full:public.dns.iij.jp 103.2.57.5 103.2.57.6'
+
+  - tag: 'ecs_mainland'          # 覆盖请求来源
+    type: 'ecs' 
+    args: 
+      auto: false 
+      ipv4: '210.21.196.6'       # 广东联通
+      force_overwrite: true      # 强制覆盖请求当前 ECS
+      mask4: 24 
+
+  - tag: 'ttl'                   # 应答生存 300 ~ 1500（ms）
+    type: 'ttl' 
+    args: 
+      minimal_ttl: 300
+      maximum_ttl: 1500
