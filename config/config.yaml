@@ -4,33 +4,29 @@
 # mosdns service uninstall
 
 log:
-  level: info # 日志级别 info / warning / error / debug，默认 info
+  level: warn # 日志级别 info / warn / error / debug，默认 info
   file: './mosdns.log' 
 
-##################################################
-include:                         # 外部配置优先初始化
+include:
   - './config_matcher.yaml'      # 请求应答匹配配置
   - './config_forward.yaml'      # 请求转发配置
   - './config_etc.yaml'          # 其他配置
   - './config_sequence.yaml'     # 执行序列配置
 
-data_providers:                  # 数据源配置
+data_providers:
   - tag: 'forged_IPv4'           # 已知污染 IP
-    file: './forged_IPv4_20200828.txt' 
-  - tag: 'oisd'                  # OISD
+    file: './forged_IPv4_20220803.txt' 
+  - tag: 'oisd'                  # OISD Domain
     file: './oisd_dblw_full.txt' 
-  - tag: 'direct-list'           # GeoSite-direct
-    file: './direct-list.txt' 
   - tag: 'geosite'               # GeoSite
     file: './geosite.dat' 
   - tag: 'geoip'                 # GeoIP
     file: './geoip.dat'     
 
-##################################################
-servers:                         # 服务器配置
+servers:
   - exec: 'sequence_main'        # 主执行序列
-    timeout: 5                   # 请求处理超时时间（s），默认 5
-    listeners: 
+    timeout: 5
+    listeners:
       - protocol: udp
         addr: 127.0.0.1:53
       - protocol: tcp
@@ -39,5 +35,6 @@ servers:                         # 服务器配置
         addr: '[::1]:53'
       - protocol: tcp
         addr: '[::1]:53'
-api:                           # API 配置
-  http: '127.0.0.1:8080'       # API 访问地址
+
+api:
+  http: '127.0.0.1:8080'
