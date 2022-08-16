@@ -35,7 +35,7 @@ plugins:
       domain:
         - 'domain:deepl.com'     # deepL translater
         # CN 类域名
-        - 'provider:geosite:cn,apple-cn,amazon@cn,google-cn,category-bank-cn,category-games@cn,category-entertainment@cn,category-media-cn,microsoft@cn,category-mooc-cn,category-securities-cn,category-scholar-cn,category-wiki-cn'
+        - 'provider:geosite:cn,apple-cn,amazon@cn,google-cn,category-bank-cn,category-games@cn,category-media-cn,microsoft@cn,category-mooc-cn,category-securities-cn,category-wiki-cn'
 
   - tag: 'matcher_oversea_domain' # 匹配境外域名请求
     type: 'query_matcher'
